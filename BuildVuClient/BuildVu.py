@@ -20,13 +20,12 @@ For detailed usage instructions, see the GitHub repository:
 """
 import json
 import os
-import sys
 import time
 
 try:
     import requests
 except ImportError:
-    sys.exit("Missing dependency: 'requests'. Install it using 'pip install requests'.")
+    raise Exception("Missing dependency: 'requests'. Install it using 'pip install requests'.")
 
 base_endpoint = None
 endpoint = None
@@ -55,61 +54,64 @@ def setup(url, timeout_length=(10, 30), conversion_timeout=30):
     convert_timeout = conversion_timeout
 
 
-def convert(input_file_path, output_file_path):
+def convert(input_file_path, output_file_path = None):
     """
-    Convert a PDF file to html
+    Converts the given file and returns the URL where the output can be previewed online. If the
+    output_file_path parameter is also passed in, a copy of the output will be downloaded to the
+    specified location.
 
     Args:
         input_file_path (str): Location of the PDF to convert, i.e 'path/to/input.pdf'
-        output_file_path (str): The directory the output will be saved in, i.e
+        output_file_path (str): (Optional) The directory the output will be saved in, i.e
             'path/to/output/dir'
 
     Returns:
-        boolean, true if conversion was successful, false otherwise
+        string, the URL where the HTML output can be previewed online
     """
     if not base_endpoint:
-        print('Converter has not been setup')
-        return False
+        raise Exception('Error: Converter has not been setup. Please call setup() before trying to '
+                        'convert a file.')
 
-    # Upload the file
     try:
         uuid = __upload(input_file_path)
     except requests.exceptions.RequestException as error:
-        print(error)
-        return False
+        raise Exception('Error uploading file: ' + str(error))
 
-    # Check the conversion status once every second until complete or timeout
+    # Check the conversion status once every second until complete or error / timeout
     count = 0
     while True:
-        count += 1
         time.sleep(1)
 
         try:
             r = __poll_status(uuid)
         except requests.exceptions.RequestException as error:
-            print(error)
-            return False
+            raise Exception('Error checking conversion status: ' + str(error))
 
         response = json.loads(r.text)
 
-        if response['state'] == 'processed' or response['state'] == 'error':
+        if response['state'] == 'processed':
             break
 
+        if response['state'] == 'error':
+            raise Exception('The server ran into an error converting file, see server logs for '
+                            'details.')
+
         if count > convert_timeout:
-            print('Failed: File took longer than ' + str(convert_timeout) + ' seconds to convert')
-            return False
+            raise Exception('Failed: File took longer than ' + str(convert_timeout) + ' seconds to convert')
+
+        count += 1
 
     # Download the conversion output
-    download_url = base_endpoint + '/' + response['downloadPath']
-    output_file_path += '/' + os.path.basename(input_file_path[:-3]) + 'zip'
+    if output_file_path is not None:
+        download_url = base_endpoint + '/' + response['downloadPath']
+        output_file_path += '/' + os.path.basename(input_file_path[:-3]) + 'zip'
 
-    try:
-        success = __download(download_url, output_file_path)
-    except requests.exceptions.RequestException as error:
-        print(error)
-        return False
+        try:
+            __download(download_url, output_file_path)
+        except requests.exceptions.RequestException as error:
+            raise Exception('Error downloading conversion output: ' + str(error))
 
-    return success
+    return base_endpoint + '/' + response['previewPath']
 
 
 def __upload(input_file_path):
@@ -122,10 +124,12 @@ def __upload(input_file_path):
         r = requests.post(endpoint, files={'file': input_file}, timeout=request_timeout)
         r.raise_for_status()
     except requests.exceptions.RequestException as error:
-        print(error)
-        raise
+        raise Exception(error)
 
     response = json.loads(r.text)
+
+    if response['uuid'] is None:
+        raise Exception('The server ran into an error uploading file, see server logs for details')
 
     return response['uuid']
 
@@ -137,9 +141,8 @@ def __poll_status(uuid):
     try:
         r = requests.get(endpoint, params={'uuid': uuid}, timeout=request_timeout)
         r.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(e)
-        raise
+    except requests.exceptions.RequestException as error:
+        raise Exception(error)
 
     return r
 
@@ -147,19 +150,15 @@ def __poll_status(uuid):
 def __download(download_url, output_file_path):
     # Private method for internal use
     # Download the given resource to the given location
-    # Return true if successful, otherwise false
     try:
         r = requests.get(download_url, timeout=request_timeout)
         r.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(e)
-        return False
+    except requests.exceptions.RequestException as error:
+        raise Exception(error)
 
     if not r.ok:
-        print('Failed: Status code ' + str(r.status_code) + ' for ' + download_url)
-        return False
+        raise Exception('Failed: Status code ' + str(r.status_code) + ' for ' + download_url)
 
     with open(output_file_path, 'wb') as output_file:
         for chunk in r.iter_content(chunk_size=1024):
             output_file.write(chunk)
-    return True
