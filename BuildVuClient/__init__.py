@@ -1,1 +1,1 @@
-from BuildVuClient import BuildVu
+from BuildVuClient.BuildVu import BuildVu
