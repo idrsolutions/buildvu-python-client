@@ -1,9 +1,15 @@
-from BuildVuClient import BuildVu as buildvu
+from BuildVuClient import BuildVu
 
-input_path = '/path/to/input.pdf'
-output_path = '/path/to/output/dir'
+buildvu = BuildVu('http://localhost:8080/microservice-example')
 
-buildvu.setup('http://localhost:8080/buildvu-microservice-example')
-success = buildvu.convert(input_path, output_path)
+try:
+    # convert() returns a URL (string) where you can view the converted output.
+    outputURL = buildvu.convert('path/to/input.pdf')
 
-print("Conversion success") if success else print("Conversion failed")
+    if outputURL is not None:
+        print("Converted: " + outputURL)
+
+    # You can also specify a directory to download the converted output to:
+    # buildvu.convert('path/to/input.pdf', 'path/to/output/dir')
+except Exception as error:
+    print(error)

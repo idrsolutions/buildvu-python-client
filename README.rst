@@ -29,25 +29,24 @@ Usage
 Basic:
 ~~~~~~
 
-First, import BuildVu and setup the converter details using
-``setup()`` :
+First, import BuildVu and setup the converter details by creating a new
+``BuildVu`` object :
 
 ::
 
-    from BuildVuClient import BuildVu as buildvu
-    buildvu.setup('http://localhost:8080/microservice-example')
+    from BuildVuClient import BuildVu
+    buildvu = BuildVu('http://localhost:8080/microservice-example')
 
 You can now convert files by calling ``convert()``. For example, to
 convert to html5 :
 
 ::
 
-    buildvu.convert('/path/to/input.pdf', '/path/to/output/dir')
+    # returns a URL where you can view the converted output.
+    print(buildvu.convert('path/to/input.pdf'))
 
-Advanced:
-~~~~~~~~~
-
-*Coming soon…*
+    # You can also specify a directory to download the converted output to:
+    buildvu.convert('path/to/input.pdf', 'path/to/output/dir')
 
 --------------
 
