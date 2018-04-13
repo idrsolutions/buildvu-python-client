@@ -18,7 +18,7 @@ def get_readme():
 
 setup(
     name='buildvu',
-    version='1.0.2',
+    version='2.0.0',
     description="Python API for IDRSolutions' Buildvu Microservice Example",
     long_description=get_readme(),
     url='https://github.com/idrsolutions/buildvu-python-client',
