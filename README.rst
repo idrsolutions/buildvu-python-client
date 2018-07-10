@@ -17,7 +17,7 @@ Using PIP:
 
 ::
 
-    pip install buildvu_python_client
+    pip install buildvu
 
 For other methods / ways to install, check out the `Python Docs`_.
 
