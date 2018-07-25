@@ -96,7 +96,7 @@ class BuildVu:
 
         # Download the conversion output
         if output_file_path is not None:
-            download_url = self.base_endpoint + '/' + response['downloadPath']
+            download_url = response['downloadPath']
             output_file_path += '/' + os.path.basename(input_file_path[:-3]) + 'zip'
 
             try:
