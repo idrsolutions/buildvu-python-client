@@ -104,7 +104,7 @@ class BuildVu:
             except requests.exceptions.RequestException as error:
                 raise Exception('Error downloading conversion output: ' + str(error))
 
-        return self.base_endpoint + '/' + response['previewPath']
+        return response['previewPath']
 
     def __upload(self, input_file_path):
         # Private method for internal use
