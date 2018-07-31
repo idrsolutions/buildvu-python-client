@@ -96,7 +96,7 @@ class BuildVu:
 
         # Download the conversion output
         if output_file_path is not None:
-            download_url = self.base_endpoint + '/' + response['downloadPath']
+            download_url = response['downloadUrl']
             output_file_path += '/' + os.path.basename(input_file_path[:-3]) + 'zip'
 
             try:
@@ -104,7 +104,7 @@ class BuildVu:
             except requests.exceptions.RequestException as error:
                 raise Exception('Error downloading conversion output: ' + str(error))
 
-        return self.base_endpoint + '/' + response['previewPath']
+        return response['previewUrl']
 
     def __upload(self, input_file_path):
         # Private method for internal use
