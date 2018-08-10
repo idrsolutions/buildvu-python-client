@@ -4,7 +4,9 @@ buildvu = BuildVu('http://localhost:8080/microservice-example')
 
 try:
     # convert() returns a URL (string) where you can view the converted output.
-    outputURL = buildvu.convert('path/to/input.pdf')
+    outputURL = buildvu.convert("path/to/file.pdf", filename="customFileName.pdf")
+    # OR for sending via url:
+    # outputURL = buildvu.convert("http://link.to/filename", isUrl=True, filename="customFileName.pdf")
 
     if outputURL is not None:
         print("Converted: " + outputURL)

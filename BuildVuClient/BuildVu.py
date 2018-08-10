@@ -46,7 +46,7 @@ class BuildVu:
         self.request_timeout = timeout_length
         self.convert_timeout = conversion_timeout
 
-    def convert(self, input_file_path, output_file_path=None):
+    def convert(self, input_file_path, output_file_path=None, isUrl=False, filename=None):
         """
         Converts the given file and returns the URL where the output can be previewed online. If the
         output_file_path parameter is also passed in, a copy of the output will be downloaded to the
@@ -56,6 +56,10 @@ class BuildVu:
             input_file_path (str): Location of the PDF to convert, i.e 'path/to/input.pdf'
             output_file_path (str): (Optional) The directory the output will be saved in, i.e
                 'path/to/output/dir'
+            isUrl (bool): (Optional) Specifies if the given input path is is a url (default is false).
+            filename (str): (Optional) Specify the name the file should be output as (recommended if sending
+                url since otherwise the server will have to try and extract the filename from the url;
+                which may cause errors).
 
         Returns:
             string, the URL where the HTML output can be previewed online
@@ -65,7 +69,7 @@ class BuildVu:
                             'convert a file.')
 
         try:
-            uuid = self.__upload(input_file_path)
+            uuid = self.__upload(input_file_path, isUrl, filename)
         except requests.exceptions.RequestException as error:
             raise Exception('Error uploading file: ' + str(error))
 
@@ -90,7 +94,7 @@ class BuildVu:
 
             if count > self.convert_timeout:
                 raise Exception('Failed: File took longer than ' + str(self.convert_timeout) +
-                                'seconds to convert')
+                                ' seconds to convert')
 
             count += 1
 
@@ -106,15 +110,26 @@ class BuildVu:
 
         return response['previewUrl']
 
-    def __upload(self, input_file_path):
+    def __upload(self, input_file_path, isUrl, filename):
         # Private method for internal use
         # Upload the given file to be converted
         # Return the UUID string associated with conversion
-        input_file = open(input_file_path, 'rb')
+
+        params = {}
+
+        if filename is not None:
+            params["filename"] = filename
 
         try:
-            r = requests.post(self.endpoint, files={'file': input_file},
-                              timeout=self.request_timeout)
+            if not isUrl:
+                input_file = open(input_file_path, 'rb')
+                r = requests.post(self.endpoint, files={'file': input_file},
+                                  data=params,
+                                  timeout=self.request_timeout)
+            else:
+                params["conversionUrl"] = input_file_path
+                r = requests.post(self.endpoint, data=params,
+                                  timeout=self.request_timeout)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             raise Exception(error)
