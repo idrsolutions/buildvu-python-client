@@ -6,7 +6,7 @@ try:
     # convert() returns a URL (string) where you can view the converted output.
     outputURL = buildvu.convert("path/to/file.pdf")
     # OR for sending via url:
-    #outputURL = buildvu.convert("http://localhost/pdf/small.pdf", isUrl=True)
+    #outputURL = buildvu.convert("http://example/url/file.pdf", isUrl=True)
 
     if outputURL is not None:
         print("Converted: " + outputURL)
