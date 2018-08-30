@@ -44,14 +44,12 @@ convert to html5 :
 
     # returns a URL where you can view the converted output.
     print(buildvu.convert('path/to/input.pdf'))
-    
+
     # Alternatively, you can specify a url from which the server will download the file to convert.
-    print(buildvu.convert("http://link.to/filename", isUrl=True, filename="customFileName.pdf"))
+    print(buildvu.convert("http://link.to/filename", isUrl=True))
 
     # You can also specify a directory to download the converted output to:
     buildvu.convert('path/to/input.pdf', 'path/to/output/dir')
- 
-When passing a url to the server it is recommended that you specify the filename in the call to ``convert()`` as the server may not be able to parse a filename from the url. It is also possible to do this when passing a file directly to the server. Note: the filename is just the name you want the output file to be.
 
 --------------
 
