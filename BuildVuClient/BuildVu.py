@@ -59,7 +59,7 @@ class BuildVu:
             input_file_path (str): Location of the PDF to convert, i.e 'path/to/input.pdf'
             output_file_path (str): (Optional) The directory the output will be saved in, i.e
                 'path/to/output/dir'
-            isUrl (bool): (Optional) Specifies if the given input path is is a url (default is false).
+            inputType (str): (Optional) Specifies if the given input paths type.
 
         Returns:
             string, the URL where the HTML output can be previewed online
