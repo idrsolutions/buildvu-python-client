@@ -30,6 +30,9 @@ except ImportError:
 
 class BuildVu:
 
+    DOWNLOAD = "download"
+    UPLOAD = "upload"
+
     def __init__(self, url, timeout_length=(10, 30), conversion_timeout=30):
         """
         Constructor, setup the converter details
@@ -46,7 +49,7 @@ class BuildVu:
         self.request_timeout = timeout_length
         self.convert_timeout = conversion_timeout
 
-    def convert(self, input_file_path, output_file_path=None):
+    def convert(self, input_file_path, output_file_path=None, inputType=UPLOAD):
         """
         Converts the given file and returns the URL where the output can be previewed online. If the
         output_file_path parameter is also passed in, a copy of the output will be downloaded to the
@@ -56,6 +59,7 @@ class BuildVu:
             input_file_path (str): Location of the PDF to convert, i.e 'path/to/input.pdf'
             output_file_path (str): (Optional) The directory the output will be saved in, i.e
                 'path/to/output/dir'
+            inputType (str): (Optional) Specifies if the given input paths type.
 
         Returns:
             string, the URL where the HTML output can be previewed online
@@ -65,7 +69,7 @@ class BuildVu:
                             'convert a file.')
 
         try:
-            uuid = self.__upload(input_file_path)
+            uuid = self.__upload(input_file_path, inputType)
         except requests.exceptions.RequestException as error:
             raise Exception('Error uploading file: ' + str(error))
 
@@ -90,7 +94,7 @@ class BuildVu:
 
             if count > self.convert_timeout:
                 raise Exception('Failed: File took longer than ' + str(self.convert_timeout) +
-                                'seconds to convert')
+                                ' seconds to convert')
 
             count += 1
 
@@ -106,15 +110,25 @@ class BuildVu:
 
         return response['previewUrl']
 
-    def __upload(self, input_file_path):
+    def __upload(self, input_file_path, inputType):
         # Private method for internal use
         # Upload the given file to be converted
         # Return the UUID string associated with conversion
-        input_file = open(input_file_path, 'rb')
+
+        params = {"input": inputType}
 
         try:
-            r = requests.post(self.endpoint, files={'file': input_file},
-                              timeout=self.request_timeout)
+            if inputType == BuildVu.UPLOAD:
+                input_file = open(input_file_path, 'rb')
+                r = requests.post(self.endpoint, files={'file': input_file},
+                                  data=params,
+                                  timeout=self.request_timeout)
+            elif inputType == BuildVu.DOWNLOAD:
+                params["url"] = input_file_path
+                r = requests.post(self.endpoint, data=params,
+                                  timeout=self.request_timeout)
+            else:
+                raise ValueError("Invalid input type given to client")
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             raise Exception(error)
