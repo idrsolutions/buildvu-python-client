@@ -1,11 +1,11 @@
 BuildVu Python Client
 =====================
 
-The Buildvu Python Client is the Python API for IDRsolutions’ `BuildVu
-Microservice Example`_.
+Convert PDF to HTML5 or SVG with Python, using the BuildVu Python Client to
+interact with IDRsolutions' `BuildVu Microservice Example`_.
 
-It functions as an easy to use, plug and play library that lets you use
-`BuildVu`_ from Python.
+The BuildVu Microservice Example is an open source project that allows you to
+convert PDF to HTML5 or SVG by running `BuildVu`_ as an online service.
 
 --------------
 
