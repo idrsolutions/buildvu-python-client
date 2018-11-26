@@ -49,7 +49,7 @@ class BuildVu:
         self.request_timeout = timeout_length
         self.convert_timeout = conversion_timeout
 
-    def convert(self, input_file_path, output_file_path=None, inputType=UPLOAD):
+    def convert(self, input_file_path, output_file_path=None, inputType=UPLOAD, callbackUrl=None):
         """
         Converts the given file and returns the URL where the output can be previewed online. If the
         output_file_path parameter is also passed in, a copy of the output will be downloaded to the
@@ -60,6 +60,8 @@ class BuildVu:
             output_file_path (str): (Optional) The directory the output will be saved in, i.e
                 'path/to/output/dir'
             inputType (str): (Optional) Specifies if the given input paths type.
+            callbackUrl (str): (Optional) The URL contacted when the conversion finishes. This will
+                stop the polling behaviour after the intial request and return the uuid instead of URL
 
         Returns:
             string, the URL where the HTML output can be previewed online
@@ -69,7 +71,7 @@ class BuildVu:
                             'convert a file.')
 
         try:
-            uuid = self.__upload(input_file_path, inputType)
+            uuid = self.__upload(input_file_path, inputType, callbackUrl)
         except requests.exceptions.RequestException as error:
             raise Exception('Error uploading file: ' + str(error))
 
@@ -91,6 +93,10 @@ class BuildVu:
             if response['state'] == 'error':
                 raise Exception('The server ran into an error converting file, see server logs for '
                                 'details.')
+            if callbackUrl is not None:
+                response['state'] = 'processing'
+                response['previewUrl'] = uuid
+                break
 
             if count > self.convert_timeout:
                 raise Exception('Failed: File took longer than ' + str(self.convert_timeout) +
@@ -110,12 +116,14 @@ class BuildVu:
 
         return response['previewUrl']
 
-    def __upload(self, input_file_path, inputType):
+    def __upload(self, input_file_path, inputType, callbackUrl):
         # Private method for internal use
         # Upload the given file to be converted
         # Return the UUID string associated with conversion
 
         params = {"input": inputType}
+        if callbackUrl is not None:
+            params.update({"callbackUrl": callbackUrl})
 
         try:
             if inputType == BuildVu.UPLOAD:
