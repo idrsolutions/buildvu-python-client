@@ -48,30 +48,28 @@ class BuildVu:
         self.endpoint = url + '/buildvu'
         self.request_timeout = timeout_length
         self.convert_timeout = conversion_timeout
+        self.__resetFiles()
 
-    def convert(self, input_file_path, output_file_path=None, inputType=UPLOAD, callbackUrl=None):
+    def convert(self, **params):
         """
-        Converts the given file and returns the URL where the output can be previewed online. If the
-        output_file_path parameter is also passed in, a copy of the output will be downloaded to the
-        specified location.
+        Converts the given file and returns an dictionary with the conversion results. If you wish to
+        upload the file, then use prepareFile() first. You can then get the use the values from the
+        dictionary, or use methods like downloadResult().
 
         Args:
-            input_file_path (str): Location of the PDF to convert, i.e 'path/to/input.pdf'
-            output_file_path (str): (Optional) The directory the output will be saved in, i.e
-                'path/to/output/dir'
-            inputType (str): (Optional) Specifies if the given input paths type.
-            callbackUrl (str): (Optional) The URL contacted when the conversion finishes. This will
-                stop the polling behaviour after the intial request and return the uuid instead of URL
+            input (str): The method of inputting a file. Examples are BuildVu.DOWNLOAD or BuildVu.UPLOAD
+            url (str): (Optional) The url for the server to download a PDF from
 
         Returns:
-            string, the URL where the HTML output can be previewed online
+            dict [ of str: str ], The results of the conversion
         """
+        print(self.files)
         if not self.base_endpoint:
-            raise Exception('Error: Converter has not been setup. Please call setup() before trying to '
-                            'convert a file.')
+            raise Exception('Error: Converter has not been setup. Please create an instance of the BuildVu'
+                            ' class first.')
 
         try:
-            uuid = self.__upload(input_file_path, inputType, callbackUrl)
+            uuid = self.__upload(params)
         except requests.exceptions.RequestException as error:
             raise Exception('Error uploading file: ' + str(error))
 
@@ -93,7 +91,7 @@ class BuildVu:
             if response['state'] == 'error':
                 raise Exception('The server ran into an error converting file, see server logs for '
                                 'details.')
-            if callbackUrl is not None:
+            if params.get('callbackUrl') is not None:
                 response['state'] = 'processing'
                 response['previewUrl'] = uuid
                 break
@@ -104,39 +102,43 @@ class BuildVu:
 
             count += 1
 
-        # Download the conversion output
-        if output_file_path is not None:
-            download_url = response['downloadUrl']
-            output_file_path += '/' + os.path.basename(input_file_path[:-3]) + 'zip'
+        self.__resetFiles()
+        return response
+        
+    def prepareFile(self, input_file_path):
+        """
+        Loads the appropriate file to prepare for it to be uploaded. To be used with the
+        UPLOAD input type.
 
-            try:
-                self.__download(download_url, output_file_path)
-            except requests.exceptions.RequestException as error:
-                raise Exception('Error downloading conversion output: ' + str(error))
+        Args:
+            input_file_path (str): Location of the PDF to convert, i.e 'path/to/input.pdf'
+        """
+        self.files = {'file': open(input_file_path, 'rb')}
+        
+    def downloadResult(self, results, output_file_path, file_name=None):
+        """
+        Downloads the zip file produced by the microservice. Provide '.' as the output_file_path
+        if you wish to use the current directory. Will use the filename of the zip on the server
+        if none is specified.
+        """
+        download_url = results['downloadUrl']
+        if file_name is not None:
+            output_file_path += '/' + file_name + '.zip'
+        else:
+            output_file_path += '/' + download_url.split('/').pop()
+        try:
+            self.__download(download_url, output_file_path)
+        except requests.exceptions.RequestException as error:
+            raise Exception('Error downloading conversion output: ' + str(error))
 
-        return response['previewUrl']
-
-    def __upload(self, input_file_path, inputType, callbackUrl):
+    def __upload(self, params):
+        print(params)
         # Private method for internal use
         # Upload the given file to be converted
         # Return the UUID string associated with conversion
 
-        params = {"input": inputType}
-        if callbackUrl is not None:
-            params.update({"callbackUrl": callbackUrl})
-
         try:
-            if inputType == BuildVu.UPLOAD:
-                input_file = open(input_file_path, 'rb')
-                r = requests.post(self.endpoint, files={'file': input_file},
-                                  data=params,
-                                  timeout=self.request_timeout)
-            elif inputType == BuildVu.DOWNLOAD:
-                params["url"] = input_file_path
-                r = requests.post(self.endpoint, data=params,
-                                  timeout=self.request_timeout)
-            else:
-                raise ValueError("Invalid input type given to client")
+            r = requests.post(self.endpoint, files=self.files, data=params, timeout=self.request_timeout)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             raise Exception(error)
@@ -175,3 +177,8 @@ class BuildVu:
         with open(output_file_path, 'wb') as output_file:
             for chunk in r.iter_content(chunk_size=1024):
                 output_file.write(chunk)
+                
+    def __resetFiles(self):
+        # Private method for internal use
+        # Reset the files that have been prepared
+        self.files = {'file': None}

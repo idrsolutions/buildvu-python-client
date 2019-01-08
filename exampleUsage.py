@@ -3,19 +3,28 @@ from BuildVuClient import BuildVu
 buildvu = BuildVu('http://localhost:8080/microservice-example')
 
 try:
-    # convert() returns a URL (string) where you can view the converted output.
-    outputURL = buildvu.convert('path/to/file.pdf')
+    # Prepare a local file to be uploaded to the BuildVu microservice
+    buildvu.prepareFile('path/to/file.pdf')
+    
+    # convert() returns an dictionary with the conversion results.
+    conversionResults = buildvu.convert(input=BuildVu.UPLOAD)
 
-    # Alternatively, you can specify a url from which the server will download the file to convert.
-    #outputURL = buildvu.convert('http://link.to/filename',
-    #                            inputType=BuildVu.DOWNLOAD)
-
-    # You can specify a URL that you want to be updated when the coversion finishes
-    #outputURL = buildvu.convert('path/to/file.pdf',
+    # You can specify other parameters for the API as named parameters, for example
+    # here is the use of the callbackUrl parameter which is a URL that you want to 
+    # be updated when the conversion finishes. 
+    # See https://github.com/idrsolutions/buildvu-microservice-example/blob/master/API.md
+    #conversionResults = buildvu.convert(input=BuildVu.UPLOAD
     #                            callbackUrl='http://listener.url')
 
-    # You can also specify a directory to download the converted output to:
-    # buildvu.convert('path/to/input.pdf', 'path/to/output/dir')
+    # Alternatively, you can specify a url from which the server will download the file to convert.
+    # Note: You do not require to prepareFile() if you use this method
+    #conversionResults = buildvu.convert(url='http://link.to/filename',
+    #                            input=BuildVu.DOWNLOAD)
+
+    outputURL = conversionResults['previewUrl']
+
+    # After the conversion you can also specify a directory to download the output to:
+    #buildvu.downloadResult(conversionResults, 'path/to/output/dir')
 
     if outputURL is not None:
         print("Converted: " + outputURL)
