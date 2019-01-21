@@ -13,7 +13,7 @@ try:
     # here is the use of the callbackUrl parameter which is a URL that you want to 
     # be updated when the conversion finishes. 
     # See https://github.com/idrsolutions/buildvu-microservice-example/blob/master/API.md
-    #conversionResults = buildvu.convert(input=BuildVu.UPLOAD
+    #conversionResults = buildvu.convert(input=BuildVu.UPLOAD,
     #                            callbackUrl='http://listener.url')
 
     # Alternatively, you can specify a url from which the server will download the file to convert.

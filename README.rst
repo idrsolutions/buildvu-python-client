@@ -37,22 +37,41 @@ First, import BuildVu and setup the converter details by creating a new
     from BuildVuClient import BuildVu
     buildvu = BuildVu('http://localhost:8080/microservice-example')
 
-You can now convert files by calling ``convert()``. For example, to
-convert to html5 :
+You can now convert files by calling the methods available. ``convert()`` will 
+start the conversion process. If you want to upload a file via this client, 
+then you must first call ``prepareFile()``. For example to convert to html5 : 
 
 ::
 
-    # returns a URL where you can view the converted output.
-    print(buildvu.convert('path/to/input.pdf'))
+    # Prepare the local file for upload
+    buildvu.prepareFile('path/to/file.pdf')
 
-    # Alternatively, you can specify a url from which the server will download the file to convert.
-    print(buildvu.convert("http://link.to/filename", inputType=BuildVu.DOWNLOAD))
-	
-    # You can specify a URL that you want to be updated when the conversion finishes
-    #outputURL = buildvu.convert('path/to/file.pdf', callbackUrl='http://listener.url')
+    # Convert the file with the input method specified
+    results = buildvu.convert(input=BuildVu.UPLOAD)
 
-    # You can also specify a directory to download the converted output to:
-    buildvu.convert('path/to/input.pdf', 'path/to/output/dir')
+    # Return a URL where you can view the converted output.
+    print(results['previewUrl'])
+
+Alternatively, you can specify a url from which the server will download the 
+file to convert.
+This method does not require the prepareFile() method.
+
+::
+    # Convert the file with the input method specified
+    results = buildvu.convert(input=BuildVu.DOWNLOAD, url="http://link.to/filename")
+
+    # Return a URL where you can view the converted output.
+    print(results['previewUrl'])
+
+Once you have converted the file you can also specify a directory to download 
+the converted output to:
+
+::
+    # Download the converted output to a specified directory:
+    buildvu.downloadResult(conversionResults, 'path/to/output/dir')
+
+Additional parameters can be used in ``convert()``, they are defined in our 
+`API`_
 
 --------------
 
@@ -79,14 +98,14 @@ expected to follow the `code of conduct`_.
 
 Copyright 2018 IDRsolutions
 
-Licensed under the Apache License, Version 2.0 (the “License”); you may
+Licensed under the Apache License, Version 2.0 (the “License�?); you may
 not use this file except in compliance with the License. You may obtain
 a copy of the License at
 
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an “AS IS” BASIS,
+distributed under the License is distributed on an “AS IS�? BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
@@ -96,3 +115,4 @@ limitations under the License.
 .. _Python Docs: https://packaging.python.org/tutorials/installing-packages
 .. _here: https://idrsolutions.zendesk.com/hc/en-us/requests/new
 .. _code of conduct: CODE_OF_CONDUCT.md
+.. _API: https://github.com/idrsolutions/buildvu-microservice-example/blob/master/API.md
