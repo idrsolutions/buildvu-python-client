@@ -52,7 +52,7 @@ class BuildVu:
 
     def convert(self, **params):
         """
-        Converts the given file and returns an dictionary with the conversion results. If you wish to
+        Converts the given file and returns a dictionary with the conversion results. If you wish to
         upload the file, then use prepareFile() first. You can then get the use the values from the
         dictionary, or use methods like downloadResult().
 
@@ -92,8 +92,6 @@ class BuildVu:
                 raise Exception('The server ran into an error converting file, see server logs for '
                                 'details.')
             if params.get('callbackUrl') is not None:
-                response['state'] = 'processing'
-                response['previewUrl'] = uuid
                 break
 
             if count > self.convert_timeout:
@@ -120,6 +118,10 @@ class BuildVu:
         Downloads the zip file produced by the microservice. Provide '.' as the output_file_path
         if you wish to use the current directory. Will use the filename of the zip on the server
         if none is specified.
+
+        Args:
+            output_file_path (str): The output location to save the zip file to
+            file_name (str): (Optional) The custom name for the zip file - Should not include .zip
         """
         download_url = results['downloadUrl']
         if file_name is not None:
