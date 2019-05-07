@@ -38,16 +38,12 @@ First, import BuildVu and setup the converter details by creating a new
     buildvu = BuildVu('http://localhost:8080/microservice-example')
 
 You can now convert files by calling the methods available. ``convert()`` will 
-start the conversion process. If you want to upload a file via this client, 
-then you must first call ``prepareFile()``. For example to convert to html5 : 
+start the conversion process. For example to convert to html5 : 
 
 ::
 
-    # Prepare the local file for upload
-    buildvu.prepareFile('path/to/file.pdf')
-
     # Convert the file with the input method specified
-    results = buildvu.convert(input=BuildVu.UPLOAD)
+    results = buildvu.convert(input=BuildVu.UPLOAD, file='path/to/file.pdf')
 
     # Return a URL where you can view the converted output.
     print(results['previewUrl'])
