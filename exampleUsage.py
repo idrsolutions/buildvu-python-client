@@ -3,11 +3,9 @@ from BuildVuClient import BuildVu
 buildvu = BuildVu('http://localhost:8080/microservice-example')
 
 try:
-    # Prepare a local file to be uploaded to the BuildVu microservice
-    buildvu.prepareFile('path/to/file.pdf')
-    
+    # Upload a local file to the BuildVu microservice
     # convert() returns an dictionary with the conversion results.
-    conversionResults = buildvu.convert(input=BuildVu.UPLOAD)
+    conversionResults = buildvu.convert(input=BuildVu.UPLOAD, file='path/to/file.pdf')
 
     # You can specify other parameters for the API as named parameters, for example
     # here is the use of the callbackUrl parameter which is a URL that you want to 
@@ -17,7 +15,6 @@ try:
     #                            callbackUrl='http://listener.url')
 
     # Alternatively, you can specify a url from which the server will download the file to convert.
-    # Note: You do not require to prepareFile() if you use this method
     #conversionResults = buildvu.convert(url='http://link.to/filename',
     #                            input=BuildVu.DOWNLOAD)
 

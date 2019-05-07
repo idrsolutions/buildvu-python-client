@@ -48,22 +48,21 @@ class BuildVu:
         self.endpoint = url + '/buildvu'
         self.request_timeout = timeout_length
         self.convert_timeout = conversion_timeout
-        self.__resetFiles()
 
     def convert(self, **params):
         """
-        Converts the given file and returns a dictionary with the conversion results. If you wish to
-        upload the file, then use prepareFile() first. You can then get the use the values from the
+        Converts the given file and returns a dictionary with the conversion results. Requires the 'input' 
+        and either 'url' or 'file' parameters to run. You can then get the use the values from the returned
         dictionary, or use methods like downloadResult().
 
         Args:
             input (str): The method of inputting a file. Examples are BuildVu.DOWNLOAD or BuildVu.UPLOAD
+            file (str): (Optional) Location of the PDF to convert, i.e 'path/to/input.pdf'
             url (str): (Optional) The url for the server to download a PDF from
 
         Returns:
             dict [ of str: str ], The results of the conversion
         """
-        print(self.files)
         if not self.base_endpoint:
             raise Exception('Error: Converter has not been setup. Please create an instance of the BuildVu'
                             ' class first.')
@@ -100,18 +99,7 @@ class BuildVu:
 
             count += 1
 
-        self.__resetFiles()
         return response
-        
-    def prepareFile(self, input_file_path):
-        """
-        Loads the appropriate file to prepare for it to be uploaded. To be used with the
-        UPLOAD input type.
-
-        Args:
-            input_file_path (str): Location of the PDF to convert, i.e 'path/to/input.pdf'
-        """
-        self.files = {'file': open(input_file_path, 'rb')}
         
     def downloadResult(self, results, output_file_path, file_name=None):
         """
@@ -134,13 +122,17 @@ class BuildVu:
             raise Exception('Error downloading conversion output: ' + str(error))
 
     def __upload(self, params):
-        print(params)
         # Private method for internal use
         # Upload the given file to be converted
         # Return the UUID string associated with conversion
-
+        if params.input == self.UPLOAD and 'file' in params:
+            files = {'file': open(params.file, 'rb')}
+            del params.file
+        else:
+            files = {}
+        
         try:
-            r = requests.post(self.endpoint, files=self.files, data=params, timeout=self.request_timeout)
+            r = requests.post(self.endpoint, files=files, data=params, timeout=self.request_timeout)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             raise Exception(error)
@@ -179,8 +171,3 @@ class BuildVu:
         with open(output_file_path, 'wb') as output_file:
             for chunk in r.iter_content(chunk_size=1024):
                 output_file.write(chunk)
-                
-    def __resetFiles(self):
-        # Private method for internal use
-        # Reset the files that have been prepared
-        self.files = {'file': None}
