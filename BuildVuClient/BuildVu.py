@@ -52,7 +52,7 @@ class BuildVu:
     def convert(self, **params):
         """
         Converts the given file and returns a dictionary with the conversion results. Requires the 'input' 
-        and either 'url' or 'file' parameters to run. You can then get the use the values from the returned
+        and either 'url' or 'file' parameters to run. You can then use the values from the returned
         dictionary, or use methods like downloadResult().
 
         Args:
