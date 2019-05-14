@@ -50,7 +50,6 @@ start the conversion process. For example to convert to html5 :
 
 Alternatively, you can specify a url from which the server will download the 
 file to convert.
-This method does not require the prepareFile() method.
 
 ::
 
