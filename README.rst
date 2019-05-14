@@ -65,7 +65,7 @@ the converted output to:
 ::
 
     # Download the converted output to a specified directory:
-    buildvu.downloadResult(conversionResults, 'path/to/output/dir')
+    buildvu.downloadResult(results, 'path/to/output/dir')
 
 Additional parameters can be used in ``convert()``, they are defined in our 
 `API`_
