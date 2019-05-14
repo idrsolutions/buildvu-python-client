@@ -49,27 +49,26 @@ class BuildVu:
         self.request_timeout = timeout_length
         self.convert_timeout = conversion_timeout
 
-    def convert(self, input_file_path, output_file_path=None, inputType=UPLOAD):
+    def convert(self, **params):
         """
-        Converts the given file and returns the URL where the output can be previewed online. If the
-        output_file_path parameter is also passed in, a copy of the output will be downloaded to the
-        specified location.
+        Converts the given file and returns a dictionary with the conversion results. Requires the 'input' 
+        and either 'url' or 'file' parameters to run. You can then use the values from the returned
+        dictionary, or use methods like downloadResult().
 
         Args:
-            input_file_path (str): Location of the PDF to convert, i.e 'path/to/input.pdf'
-            output_file_path (str): (Optional) The directory the output will be saved in, i.e
-                'path/to/output/dir'
-            inputType (str): (Optional) Specifies if the given input paths type.
+            input (str): The method of inputting a file. Examples are BuildVu.DOWNLOAD or BuildVu.UPLOAD
+            file (str): (Optional) Location of the PDF to convert, i.e 'path/to/input.pdf'
+            url (str): (Optional) The url for the server to download a PDF from
 
         Returns:
-            string, the URL where the HTML output can be previewed online
+            dict [ of str: str ], The results of the conversion
         """
         if not self.base_endpoint:
-            raise Exception('Error: Converter has not been setup. Please call setup() before trying to '
-                            'convert a file.')
+            raise Exception('Error: Converter has not been setup. Please create an instance of the BuildVu'
+                            ' class first.')
 
         try:
-            uuid = self.__upload(input_file_path, inputType)
+            uuid = self.__upload(params)
         except requests.exceptions.RequestException as error:
             raise Exception('Error uploading file: ' + str(error))
 
@@ -91,6 +90,8 @@ class BuildVu:
             if response['state'] == 'error':
                 raise Exception('The server ran into an error converting file, see server logs for '
                                 'details.')
+            if params.get('callbackUrl') is not None:
+                break
 
             if count > self.convert_timeout:
                 raise Exception('Failed: File took longer than ' + str(self.convert_timeout) +
@@ -98,37 +99,40 @@ class BuildVu:
 
             count += 1
 
-        # Download the conversion output
-        if output_file_path is not None:
-            download_url = response['downloadUrl']
-            output_file_path += '/' + os.path.basename(input_file_path[:-3]) + 'zip'
+        return response
+        
+    def downloadResult(self, results, output_file_path, file_name=None):
+        """
+        Downloads the zip file produced by the microservice. Provide '.' as the output_file_path
+        if you wish to use the current directory. Will use the filename of the zip on the server
+        if none is specified.
 
-            try:
-                self.__download(download_url, output_file_path)
-            except requests.exceptions.RequestException as error:
-                raise Exception('Error downloading conversion output: ' + str(error))
+        Args:
+            output_file_path (str): The output location to save the zip file to
+            file_name (str): (Optional) The custom name for the zip file - Should not include .zip
+        """
+        download_url = results['downloadUrl']
+        if file_name is not None:
+            output_file_path += '/' + file_name + '.zip'
+        else:
+            output_file_path += '/' + download_url.split('/').pop()
+        try:
+            self.__download(download_url, output_file_path)
+        except requests.exceptions.RequestException as error:
+            raise Exception('Error downloading conversion output: ' + str(error))
 
-        return response['previewUrl']
-
-    def __upload(self, input_file_path, inputType):
+    def __upload(self, params):
         # Private method for internal use
         # Upload the given file to be converted
         # Return the UUID string associated with conversion
-
-        params = {"input": inputType}
-
+        if params.input == self.UPLOAD and 'file' in params:
+            files = {'file': open(params.file, 'rb')}
+            del params.file
+        else:
+            files = {}
+        
         try:
-            if inputType == BuildVu.UPLOAD:
-                input_file = open(input_file_path, 'rb')
-                r = requests.post(self.endpoint, files={'file': input_file},
-                                  data=params,
-                                  timeout=self.request_timeout)
-            elif inputType == BuildVu.DOWNLOAD:
-                params["url"] = input_file_path
-                r = requests.post(self.endpoint, data=params,
-                                  timeout=self.request_timeout)
-            else:
-                raise ValueError("Invalid input type given to client")
+            r = requests.post(self.endpoint, files=files, data=params, timeout=self.request_timeout)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             raise Exception(error)
