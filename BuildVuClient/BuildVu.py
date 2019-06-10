@@ -125,9 +125,9 @@ class BuildVu:
         # Private method for internal use
         # Upload the given file to be converted
         # Return the UUID string associated with conversion
-        if params.input == self.UPLOAD and 'file' in params:
-            files = {'file': open(params.file, 'rb')}
-            del params.file
+        if 'input' in params and params['input'] == self.UPLOAD and 'file' in params:
+            files = {'file': open(params['file'], 'rb')}
+            del params['file']
         else:
             files = {}
         
