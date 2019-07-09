@@ -18,7 +18,7 @@ try:
     #conversionResults = buildvu.convert(url='http://link.to/filename',
     #                            input=BuildVu.DOWNLOAD)
 
-    outputURL = conversionResults['previewUrl']
+    outputURL = conversionResults['downloadUrl']
 
     # After the conversion you can also specify a directory to download the output to:
     #buildvu.downloadResult(conversionResults, 'path/to/output/dir')

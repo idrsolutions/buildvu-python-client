@@ -56,8 +56,8 @@ file to convert.
     # Convert the file with the input method specified
     results = buildvu.convert(input=BuildVu.DOWNLOAD, url="http://link.to/filename")
 
-    # Return a URL where you can view the converted output.
-    print(results['previewUrl'])
+    # Return a URL where you can download the converted output.
+    print(results['dowloadUrl'])
 
 Once you have converted the file you can also specify a directory to download 
 the converted output to:
