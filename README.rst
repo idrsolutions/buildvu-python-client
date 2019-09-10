@@ -35,7 +35,7 @@ First, import BuildVu and setup the converter details by creating a new
 ::
 
     from BuildVuClient import BuildVu
-    buildvu = BuildVu('http://localhost:8080/microservice-example')
+    buildvu = BuildVu('http://localhost:8080/buildvu-microservice')
 
 You can now convert files by calling the methods available. ``convert()`` will 
 start the conversion process. For example to convert to html5 : 
