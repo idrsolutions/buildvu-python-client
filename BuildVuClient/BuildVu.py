@@ -51,7 +51,7 @@ class BuildVu:
 
     def convert(self, **params):
         """
-        Converts the given file and returns a dictionary with the conversion results. Requires the 'input' 
+        Converts the given file and returns a dictionary with the conversion results. Requires the 'input'
         and either 'url' or 'file' parameters to run. You can then use the values from the returned
         dictionary, or use methods like downloadResult().
 
@@ -94,13 +94,12 @@ class BuildVu:
                 break
 
             if count > self.convert_timeout:
-                raise Exception('Failed: File took longer than ' + str(self.convert_timeout) +
-                                ' seconds to convert')
+                raise Exception('Failed: File took longer than ' + str(self.convert_timeout) + ' seconds to convert')
 
             count += 1
 
         return response
-        
+
     def downloadResult(self, results, output_file_path, file_name=None):
         """
         Downloads the zip file produced by the microservice. Provide '.' as the output_file_path
@@ -130,12 +129,15 @@ class BuildVu:
             del params['file']
         else:
             files = {}
-        
+
         try:
             r = requests.post(self.endpoint, files=files, data=params, timeout=self.request_timeout)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
-            raise Exception(error)
+            if r is not None:
+                raise Exception(self.get_returned_error_message(error, r))
+            else:
+                raise Exception(error)
 
         response = json.loads(r.text)
 
@@ -143,6 +145,21 @@ class BuildVu:
             raise Exception('The server ran into an error uploading file, see server logs for details')
 
         return response['uuid']
+
+    @staticmethod
+    def get_returned_error_message(error, response):
+        # Private method for internal use
+        # Create a meaningful error message from servers response
+        # Returns string
+        error_message = str(error)
+        if response.status_code is not 200:
+            content = response.text
+            if content is not None:
+                if "application/json" in response.headers['Content-Type']:
+                    json_response = json.loads(response.text)
+                    if json_response['error'] is not None:
+                        error_message += " - " + json_response['error']
+        return error_message
 
     def __poll_status(self, uuid):
         # Private method for internal use
@@ -152,7 +169,10 @@ class BuildVu:
             r = requests.get(self.endpoint, params={'uuid': uuid}, timeout=self.request_timeout)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
-            raise Exception(error)
+            if r is not None:
+                raise Exception(self.get_returned_error_message(error, r))
+            else:
+                raise Exception(error)
 
         return r
 
@@ -163,7 +183,10 @@ class BuildVu:
             r = requests.get(download_url, timeout=self.request_timeout)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
-            raise Exception(error)
+            if r is not None:
+                raise Exception(self.get_returned_error_message(error, r))
+            else:
+                raise Exception(error)
 
         if not r.ok:
             raise Exception('Failed: Status code ' + str(r.status_code) + ' for ' + download_url)
