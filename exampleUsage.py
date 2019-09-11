@@ -1,6 +1,6 @@
 from BuildVuClient import BuildVu
 
-buildvu = BuildVu('http://localhost:8080/microservice-example')
+buildvu = BuildVu('http://localhost:8080/buildvu-microservice')
 
 try:
     # Upload a local file to the BuildVu microservice
