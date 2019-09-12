@@ -135,7 +135,7 @@ class BuildVu:
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             if r is not None:
-                raise Exception(self.get_returned_error_message(error, r))
+                raise Exception(self.__get_returned_error_message(error, r))
             else:
                 raise Exception(error)
 
@@ -147,7 +147,7 @@ class BuildVu:
         return response['uuid']
 
     @staticmethod
-    def get_returned_error_message(error, response):
+    def __get_returned_error_message(error, response):
         # Private method for internal use
         # Create a meaningful error message from servers response
         # Returns string
@@ -170,7 +170,7 @@ class BuildVu:
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             if r is not None:
-                raise Exception(self.get_returned_error_message(error, r))
+                raise Exception(self.__get_returned_error_message(error, r))
             else:
                 raise Exception(error)
 
@@ -184,7 +184,7 @@ class BuildVu:
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             if r is not None:
-                raise Exception(self.get_returned_error_message(error, r))
+                raise Exception(self.__get_returned_error_message(error, r))
             else:
                 raise Exception(error)
 
