@@ -8,7 +8,7 @@ The BuildVu Microservice Example is an open source project that allows you to
 convert PDF to HTML5 or SVG by running `BuildVu`_ as an online service.
 
 IDR Solutions offer a free trial service for running BuildVu with Python, 
-more infomation on this can be found [here](https://www.idrsolutions.com/buildvu/convert-pdf-in-python/).
+more infomation on this can be found `here.`_
 
 --------------
 
@@ -116,3 +116,4 @@ limitations under the License.
 .. _here: https://idrsolutions.zendesk.com/hc/en-us/requests/new
 .. _code of conduct: CODE_OF_CONDUCT.md
 .. _API: https://github.com/idrsolutions/buildvu-microservice-example/blob/master/API.md
+.. _here.: https://www.idrsolutions.com/buildvu/convert-pdf-in-python/
