@@ -33,7 +33,7 @@ class BuildVu:
     DOWNLOAD = "download"
     UPLOAD = "upload"
 
-    def __init__(self, url, timeout_length=(10, 30), conversion_timeout=30):
+    def __init__(self, url, timeout_length=(10, 30), conversion_timeout=30, auth=None):
         """
         Constructor, setup the converter details
 
@@ -48,6 +48,7 @@ class BuildVu:
         self.endpoint = url + '/buildvu'
         self.request_timeout = timeout_length
         self.convert_timeout = conversion_timeout
+        self.auth = auth
 
     def convert(self, **params):
         """
@@ -67,6 +68,8 @@ class BuildVu:
             raise Exception('Error: Converter has not been setup. Please create an instance of the BuildVu'
                             ' class first.')
 
+        
+        
         try:
             uuid = self.__upload(params)
         except requests.exceptions.RequestException as error:
@@ -131,7 +134,7 @@ class BuildVu:
             files = {}
 
         try:
-            r = requests.post(self.endpoint, files=files, data=params, timeout=self.request_timeout)
+            r = requests.post(self.endpoint, files=files, data=params, timeout=self.request_timeout, auth=self.auth)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             if r is not None:
@@ -166,7 +169,7 @@ class BuildVu:
         # Poll converter for status of conversion with given UUID
         # Returns response object
         try:
-            r = requests.get(self.endpoint, params={'uuid': uuid}, timeout=self.request_timeout)
+            r = requests.get(self.endpoint, params={'uuid': uuid}, timeout=self.request_timeout, auth=self.auth)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             if r is not None:
@@ -180,7 +183,7 @@ class BuildVu:
         # Private method for internal use
         # Download the given resource to the given location
         try:
-            r = requests.get(download_url, timeout=self.request_timeout)
+            r = requests.get(download_url, timeout=self.request_timeout, auth=self.auth)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
             if r is not None:
