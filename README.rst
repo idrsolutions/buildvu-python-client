@@ -75,6 +75,19 @@ Additional parameters can be used in ``convert()``, they are defined in our
 
 --------------
 
+Changes for docker version
+--------------------------
+
+For our docker version authorization can be set to adjust the client to use authorization, 
+to do this simply ad a tuple containing the username an password to the initialization for BuildVu.
+::
+
+    from BuildVuClient import BuildVu
+    buildvu = BuildVu('http://localhost:8080/buildvu-microservice', auth=("username","password"))
+
+
+--------------
+
 Who do I talk to?
 =================
 
