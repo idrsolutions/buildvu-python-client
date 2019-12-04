@@ -78,8 +78,7 @@ Additional parameters can be used in ``convert()``, they are defined in our
 Changes for docker version
 --------------------------
 
-For our docker version authorization can be set to adjust the client to use authorization, 
-to do this simply ad a tuple containing the username an password to the initialization for BuildVu.
+If your BuildVu service requires authentication, you can set the username and password by passing an additional tuple argument as shown below:
 ::
 
     from BuildVuClient import BuildVu
