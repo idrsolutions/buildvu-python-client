@@ -75,6 +75,18 @@ Additional parameters can be used in ``convert()``, they are defined in our
 
 --------------
 
+Changes for docker version
+--------------------------
+
+If your BuildVu service requires authentication, you can set the username and password by passing an additional tuple argument as shown below:
+::
+
+    from BuildVuClient import BuildVu
+    buildvu = BuildVu('http://localhost:8080/buildvu-microservice', auth=("username","password"))
+
+
+--------------
+
 Who do I talk to?
 =================
 
