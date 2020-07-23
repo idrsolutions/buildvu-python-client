@@ -137,7 +137,7 @@ class BuildVu:
             r = requests.post(self.endpoint, files=files, data=params, timeout=self.request_timeout, auth=self.auth)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
-            if r is not None:
+            if 'r' in vars() and r is not None:
                 raise Exception(self.__get_returned_error_message(error, r))
             else:
                 raise Exception(error)
@@ -172,7 +172,7 @@ class BuildVu:
             r = requests.get(self.endpoint, params={'uuid': uuid}, timeout=self.request_timeout, auth=self.auth)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
-            if r is not None:
+            if 'r' in vars() and r is not None:
                 raise Exception(self.__get_returned_error_message(error, r))
             else:
                 raise Exception(error)
@@ -186,7 +186,7 @@ class BuildVu:
             r = requests.get(download_url, timeout=self.request_timeout, auth=self.auth)
             r.raise_for_status()
         except requests.exceptions.RequestException as error:
-            if r is not None:
+            if 'r' in vars() and r is not None:
                 raise Exception(self.__get_returned_error_message(error, r))
             else:
                 raise Exception(error)
