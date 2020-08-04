@@ -1,3 +1,6 @@
+ THIS PACKAGE HAS BEEN DEPRECATED 
+ =================================
+Future development has been directed to the [idrsolutions client](https://github.com/idrsolutions/idrsolutions-python-client), which can be used for the same purpose. This package will receive no more updates. 
 BuildVu Python Client
 =====================
 
