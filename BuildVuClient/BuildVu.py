@@ -21,6 +21,7 @@ For detailed usage instructions, see the GitHub repository:
 import json
 import os
 import time
+import warnings
 
 try:
     import requests
@@ -49,6 +50,7 @@ class BuildVu:
         self.request_timeout = timeout_length
         self.convert_timeout = conversion_timeout
         self.auth = auth
+        warnings.warn("This package has been deprecated, use IDRCloudClient instead")
 
     def convert(self, **params):
         """
@@ -155,7 +157,7 @@ class BuildVu:
         # Create a meaningful error message from servers response
         # Returns string
         error_message = str(error)
-        if response.status_code is not 200:
+        if response.status_code != 200:
             content = response.text
             if content is not None:
                 if "application/json" in response.headers['Content-Type']:

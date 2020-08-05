@@ -18,25 +18,25 @@ def get_readme():
 
 setup(
     name='buildvu',
-    version='4.1.4',
-    description="Python API for IDRSolutions' Buildvu Microservice Example",
+    version='4.1.5',
+    description="[Deprecated] Future development has been directed to IDRCloudClient, which can be used for the same purpose.",
     long_description=get_readme(),
     url='https://github.com/idrsolutions/buildvu-python-client',
     author='IDRSolutions',
     author_email='support@idrsolutions.zendesk.com',
     license='Apache 2.0',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        # 'Development Status :: 4 - Beta',
         # Development Status:: 5 - Production / Stable
         # Development Status:: 6 - Mature
-        # Development Status:: 7 - Inactive
+        'Development Status:: 7 - Inactive',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3 :: Only'
     ],
     keywords='idrsolutions pdf html5 converter buildvu microservice example web '
-             'application server API python client',
+             'application server API python client deprecated',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     install_requires=['requests'],
     # extras_require={
