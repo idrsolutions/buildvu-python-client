@@ -1,7 +1,7 @@
- THIS PACKAGE HAS BEEN DEPRECATED 
+THIS PACKAGE HAS BEEN DEPRECATED 
 =================================
 
-Future development has been directed to the [idrsolutions client](https://github.com/idrsolutions/idrsolutions-python-client), which can be used for the same purpose. This package will receive no more updates. 
+Future development has been directed to the `idrsolutions client`_, which can be used for the same purpose. This package will receive no more updates. 
 
 BuildVu Python Client
 =====================
@@ -127,6 +127,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+.. _idrsolutions client: https://github.com/idrsolutions/idrsolutions-python-client 
 .. _BuildVu Microservice Example: https://github.com/idrsolutions/buildvu-microservice-example
 .. _BuildVu: https://www.idrsolutions.com/buildvu/
 .. _Python Docs: https://packaging.python.org/tutorials/installing-packages
